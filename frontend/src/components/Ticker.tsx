@@ -12,8 +12,9 @@ export default function Ticker() {
       Notification.requestPermission();
     }
 
-    // In a real app, you would use an environment variable for the WS URL
-    const ws = new WebSocket("ws://localhost:8000/ws/feed");
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const wsUrl = apiUrl.replace(/^http/, "ws") + "/ws/feed";
+    const ws = new WebSocket(wsUrl);
 
     ws.onmessage = (event) => {
       try {

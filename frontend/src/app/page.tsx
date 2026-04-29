@@ -3,7 +3,7 @@ export default function Dashboard() {
     <div className="max-w-6xl mx-auto space-y-8 animate-float" style={{ animationDuration: '10s' }}>
       <header className="mb-12">
         <h1 className="text-4xl font-bold mb-2">Welcome back, <span className="text-gradient">Alex</span></h1>
-        <p className="text-neutral-400">Here's your morning briefing and platform overview.</p>
+        <p className="text-neutral-400">Here&apos;s your morning briefing and platform overview.</p>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

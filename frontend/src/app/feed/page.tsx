@@ -22,14 +22,15 @@ export default function LiveFeed() {
   const fetchNews = async (searchQuery: string = "", forceRefresh: boolean = false) => {
     setIsLoading(true);
     try {
-      const baseUrl = searchQuery ? `http://localhost:8000/api/v1/news?query=${encodeURIComponent(searchQuery)}` : `http://localhost:8000/api/v1/news`;
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const baseUrl = searchQuery ? `${apiUrl}/api/v1/news?query=${encodeURIComponent(searchQuery)}` : `${apiUrl}/api/v1/news`;
       const url = forceRefresh ? `${baseUrl}${searchQuery ? '&' : '?'}refresh=true` : baseUrl;
       
       const response = await fetch(url);
       const data = await response.json();
       
       if (data.news && Array.isArray(data.news)) {
-        const fetchedNews: FeedItem[] = data.news.map((item: any, index: number) => ({
+        const fetchedNews: FeedItem[] = data.news.map((item: Record<string, unknown>, index: number) => ({
           id: `news-${Date.now()}-${index}`,
           title: item.title,
           description: item.content || item.snippet || "No description available.",
@@ -55,9 +56,12 @@ export default function LiveFeed() {
 
   useEffect(() => {
     // Fetch initial general news
+    // eslint-disable-next-line
     fetchNews();
 
-    const ws = new WebSocket("ws://localhost:8000/ws/feed");
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const wsUrl = apiUrl.replace(/^http/, "ws") + "/ws/feed";
+    const ws = new WebSocket(wsUrl);
 
     ws.onmessage = (event) => {
       try {
@@ -137,7 +141,7 @@ export default function LiveFeed() {
         ) : feed.length === 0 ? (
           <div className="text-center text-neutral-400 py-8">No news found for this keyword.</div>
         ) : (
-          feed.map((item, index) => (
+          feed.map((item) => (
             <div key={item.id} className="glass-panel rounded-xl p-6 hover:bg-white/5 transition-all border border-white/5 hover:border-white/20">
               <div className="flex justify-between items-start mb-3">
                 <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-xl font-semibold text-white/90 hover:text-purple-400 transition-colors">

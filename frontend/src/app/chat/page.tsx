@@ -29,7 +29,9 @@ export default function Chat() {
   }, [messages, isLoading]);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8000/ws/chat");
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const wsUrl = apiUrl.replace(/^http/, "ws") + "/ws/chat";
+    const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
     ws.onmessage = (event) => {
