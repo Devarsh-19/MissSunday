@@ -32,7 +32,7 @@ services:
           type: redis
           name: miss-sunday-redis
           property: connectionString
-      - key: OPENAI_API_KEY
+      - key: GROQ_API_KEY
         sync: false
       - key: TAVILY_API_KEY
         sync: false
