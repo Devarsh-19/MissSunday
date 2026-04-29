@@ -1,20 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #05050A; /* Deep off-black */
-  --foreground: #ffffff;
-  
-  /* Primary gradient colors */
-  --primary-start: #3b82f6;
-  --primary-end: #8b5cf6;
-  
-  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-bg: rgba(5, 5, 10, 0.7);
   --glass-border: rgba(255, 255, 255, 0.08);
+  --accent-blue: #3b82f6;
+  --accent-purple: #8b5cf6;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: #020205;
+  --color-foreground: #ffffff;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   
@@ -23,11 +18,43 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: #020205;
+  color: #ffffff;
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
   letter-spacing: -0.01em;
+}
+
+/* Grainy Noise Overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Subtle Scanline Effect */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(59, 130, 246, 0.1), transparent);
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100vh); }
+  100% { transform: translateY(100vh); }
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -37,44 +64,62 @@ h1, h2, h3, h4, h5, h6 {
 /* Premium Glassmorphism Utilities */
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, var(--primary-start), var(--primary-end), #ec4899);
+  background: linear-gradient(135deg, #fff 0%, #3b82f6 50%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
-  color: transparent;
+  background-size: 200% auto;
+  animation: gradient-flow 5s ease infinite;
+}
+
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* Markdown Rendering Styles for Chat */
 .markdown-prose p {
   margin-bottom: 1rem;
-  line-height: 1.6;
+  line-height: 1.8;
 }
 .markdown-prose p:last-child {
   margin-bottom: 0;
 }
 .markdown-prose strong {
   color: #fff;
-  font-weight: 600;
+  font-weight: 800;
+  background: linear-gradient(120deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%);
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.3rem;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
 }
 .markdown-prose ul {
-  list-style-type: disc;
-  padding-left: 1.5rem;
+  list-style-type: none;
+  padding-left: 0;
   margin-bottom: 1rem;
+}
+.markdown-prose li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.markdown-prose li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: #8b5cf6;
+  font-weight: bold;
 }
 .markdown-prose ol {
   list-style-type: decimal;
   padding-left: 1.5rem;
   margin-bottom: 1rem;
-}
-.markdown-prose li {
-  margin-bottom: 0.5rem;
 }
 .markdown-prose code {
   background: rgba(0, 0, 0, 0.3);
@@ -121,9 +166,9 @@ h1, h2, h3, h4, h5, h6 {
 /* Background blob */
 .bg-blob {
   position: absolute;
-  filter: blur(120px);
+  filter: blur(180px);
   z-index: -1;
-  opacity: 0.4;
+  opacity: 0.2;
   border-radius: 50%;
 }
 
@@ -135,4 +180,55 @@ h1, h2, h3, h4, h5, h6 {
 .animate-marquee {
   display: inline-block;
   animation: marquee 20s linear infinite;
+}
+
+/* Premium Design Utilities */
+.glow-border {
+  position: relative;
+}
+.glow-border::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(135deg, var(--primary-start), var(--primary-end), #ec4899);
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.glow-border:hover::after {
+  opacity: 0.3;
+}
+
+.mesh-background {
+  background-color: #05050a;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.card-lift {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+}
+.card-lift:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
 }
