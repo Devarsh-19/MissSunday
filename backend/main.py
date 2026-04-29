@@ -51,9 +51,10 @@ app = FastAPI(title=settings.PROJECT_NAME, version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.NEXT_PUBLIC_API_URL]
-    if hasattr(settings, "NEXT_PUBLIC_API_URL")
-    else ["*"],
+    allow_origins=[settings.FRONTEND_URL] if settings.FRONTEND_URL else [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

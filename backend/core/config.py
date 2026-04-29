@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # API Keys
     GROQ_API_KEY: str
     TAVILY_API_KEY: str
+    
+    # CORS Origins
+    FRONTEND_URL: Optional[str] = None
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
 
