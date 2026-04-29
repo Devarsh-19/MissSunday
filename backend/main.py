@@ -206,7 +206,7 @@ async def websocket_chat(websocket: WebSocket):
                         # We only want to stream tokens from the final output generation
                         if (
                             event.get("metadata", {}).get("langgraph_node")
-                            == "personalization"
+                            == "reporter"
                         ):
                             chunk = event["data"]["chunk"].content
                             if chunk:

@@ -13,5 +13,5 @@ def get_llm(model_name: str = "llama-3.3-70b-versatile", temperature: float = 0)
 
 # Pre-configured instances for different purposes
 fast_llm = get_llm(model_name="llama-3.1-8b-instant", temperature=0.1)
-reasoning_llm = get_llm(model_name="llama-3.3-70b-versatile", temperature=0.1)
+reasoning_llm = get_llm(model_name="llama-3.1-8b-instant", temperature=0.1)
 creative_llm = get_llm(model_name="llama-3.3-70b-versatile", temperature=0.7)
