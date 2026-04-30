@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: miss-sunday-frontend
+    env: node
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: miss-sunday-backend
+          envVarKey: RENDER_EXTERNAL_URL
+
+  - type: web
+    name: miss-sunday-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: miss-sunday-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: miss-sunday-redis
+          property: connectionString
+      - key: GROQ_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+
+  - type: redis
+    name: miss-sunday-redis
+    plan: free
+    ipAllowList: []
+
+databases:
+  - name: miss-sunday-db
+    databaseName: miss_sunday
+    user: miss_sunday_user
+    plan: free

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogIn, AlertCircle, Info } from "lucide-react";
+import { LogIn, AlertCircle } from "lucide-react";
 
 export default function Login() {
   const router = useRouter();

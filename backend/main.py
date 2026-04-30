@@ -15,21 +15,23 @@ from core.config import settings
 from core.database import get_db
 from core.websocket import feed_manager
 from services.scheduler import setup_scheduler, shutdown_scheduler
-from services.news import fetch_news
+from services.news import fetch_news, get_news_updates
 from contextlib import asynccontextmanager
 
 
 async def simulate_breaking_news():
     """Background task to simulate breaking news alerts for demonstration."""
     alerts = [
-        "BREAKING: AI model breakthrough achieves new SOTA in reasoning.",
-        "BREAKING: Major enterprise adopts multi-agent workflows.",
-        "BREAKING: Market update: Tech stocks rally on AI advancements.",
-        "BREAKING: Security alert: New vulnerability patched in standard library.",
-        "BREAKING: Geopolitics: International summit concludes with AI treaty.",
+        "Global markets react to surprise interest rate cut by central bank.",
+        "Major breakthroughs in fusion energy reported by international research team.",
+        "New AI legislation passed by coalition, setting global standards for safety.",
+        "Unprecedented solar storm expected to impact satellite communications tonight.",
+        "Mars Rover discovers anomalous crystal structures in Gale Crater.",
+        "Revolutionary solid-state battery technology reaches 90% production readiness.",
+        "Global health initiative announces eradication of major tropical disease."
     ]
     while True:
-        await asyncio.sleep(random.randint(20, 40))
+        await asyncio.sleep(random.randint(20, 60))
         news_item = random.choice(alerts)
         await feed_manager.broadcast(
             {"type": "ALERT", "message": news_item, "timestamp": "Just now"}
@@ -51,9 +53,10 @@ app = FastAPI(title=settings.PROJECT_NAME, version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.NEXT_PUBLIC_API_URL]
-    if hasattr(settings, "NEXT_PUBLIC_API_URL")
-    else ["*"],
+    allow_origins=[settings.FRONTEND_URL] if settings.FRONTEND_URL else [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -97,11 +100,18 @@ news_cache = {}
 
 
 @app.get("/api/v1/news")
-async def get_news(query: str | None = None, refresh: bool = False):
+async def get_news(
+    query: str | None = None,
+    category: str | None = None,
+    refresh: bool = False,
+    summarize: bool = True,
+):
     """
-    Fetches news based on the given query. Uses in-memory caching unless refresh is True.
+    Fetches news based on the given query or category. Uses in-memory caching unless refresh is True.
+    If summarize is True, it returns punchy updates.
     """
-    cache_key = query or "general"
+    effective_category = category or query or "World"
+    cache_key = f"{effective_category}_{'summarized' if summarize else 'raw'}"
 
     try:
         if not refresh and cache_key in news_cache:
@@ -111,7 +121,10 @@ async def get_news(query: str | None = None, refresh: bool = False):
                 "cached": True,
             }
 
-        news_items = await fetch_news(query)
+        if summarize:
+            news_items = await get_news_updates(effective_category)
+        else:
+            news_items = await fetch_news(effective_category)
 
         # Save to cache
         news_cache[cache_key] = {
@@ -139,6 +152,7 @@ async def chat_endpoint(request: ChatRequest):
     initial_state = {
         "messages": [HumanMessage(content=request.message)],
         "user_id": request.user_id,
+        "verification_attempts": 0,
     }
 
     try:
@@ -180,6 +194,7 @@ async def websocket_chat(websocket: WebSocket):
             initial_state = {
                 "messages": [HumanMessage(content=user_message)],
                 "user_id": user_id,
+                "verification_attempts": 0,
             }
 
             try:
@@ -193,7 +208,7 @@ async def websocket_chat(websocket: WebSocket):
                         # We only want to stream tokens from the final output generation
                         if (
                             event.get("metadata", {}).get("langgraph_node")
-                            == "personalization"
+                            == "reporter"
                         ):
                             chunk = event["data"]["chunk"].content
                             if chunk:
