@@ -152,6 +152,7 @@ async def chat_endpoint(request: ChatRequest):
     initial_state = {
         "messages": [HumanMessage(content=request.message)],
         "user_id": request.user_id,
+        "verification_attempts": 0,
     }
 
     try:
@@ -193,6 +194,7 @@ async def websocket_chat(websocket: WebSocket):
             initial_state = {
                 "messages": [HumanMessage(content=user_message)],
                 "user_id": user_id,
+                "verification_attempts": 0,
             }
 
             try:

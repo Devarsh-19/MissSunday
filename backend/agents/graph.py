@@ -32,7 +32,7 @@ def build_graph():
     def should_continue_verify(state: AgentState):
         """Check if verification passed or if we need more research."""
         status = state.get("verification_status")
-        attempts = state.get("verification_attempts", 0)
+        attempts = state.get("verification_attempts") or 0
         
         # If incomplete and haven't tried too many times, go back to scout
         if status == "INCOMPLETE" and attempts < 3:

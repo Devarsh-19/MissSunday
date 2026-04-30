@@ -44,7 +44,7 @@ def verify_node(state: AgentState) -> dict:
     """
     messages = state.get("messages", [])
     scout_results = state.get("scout_results", "")
-    attempts = state.get("verification_attempts", 0)
+    attempts = state.get("verification_attempts") or 0
     
     llm_with_structured = reasoning_llm.with_structured_output(VerificationResult)
     
