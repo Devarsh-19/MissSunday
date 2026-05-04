@@ -1,7 +1,7 @@
 from langchain_groq import ChatGroq
 from core.config import settings
 
-def get_llm(model_name: str = "llama-3.3-70b-versatile", temperature: float = 0):
+def get_llm(model_name: str = "llama-3.3-70b-versatile", temperature: float = 0.1):
     """
     Returns an instance of ChatGroq configured with our API key.
     """
